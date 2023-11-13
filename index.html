@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One</title>
+    <style>
+        body {
+            font-family: 'Playfair Display', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4b2e83;
+            color: #fff;
+            background-image: url('background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        select, button {
+
+			
+			width: 50%;
+            height: 2.5em;
+            font-size: 1em;
+            padding: 10px;
+            margin-bottom: 0.5em;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #6d46a2;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #8d5dbf;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <h1>Find your cosmic match.</h1>
+            <p>Discover compatibility based on birth charts</p>
+            <form action="#" method="post">
+                <input type="email" name="email" placeholder="Email" required>
+                <select id="country" name="country"><option value="">Select Country</option></select>
+                <select id="city" name="city"><option value="">Select City</option></select>
+                <button type="submit">Submit</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCountries();
+
+            document.getElementById('country').addEventListener('change', function() {
+                var country = this.value;
+                loadCities(country);
+            });
+        });
+
+        function loadCountries() {
+            fetch('http://api.geonames.org/countryInfoJSON?username=ibrajim')
+            .then(handleResponse)
+            .then(data => {
+                var select = document.getElementById('country');
+                data.geonames.forEach(country => {
+                    var option = document.createElement('option');
+                    option.value = country.countryCode;
+                    option.textContent = country.countryName;
+                    select.appendChild(option);
+                });
+            }).catch(error => {
+                console.error('Error loading countries:', error);
+                alert('Failed to load countries. Please try again later.');
+            });
+        }
+
+        function loadCities(countryCode) {
+            fetch(`http://api.geonames.org/searchJSON?country=${countryCode}&username=ibrajim`)
+            .then(handleResponse)
+            .then(data => {
+                var select = document.getElementById('city');
+                select.innerHTML = ''; // Clear previous options
+                data.geonames.forEach(city => {
+                    var option = document.createElement('option');
+                    option.value = city.toponymName;
+                    option.textContent = city.toponymName;
+                    select.appendChild(option);
+                });
+            }).catch(error => {
+                console.error('Error loading cities:', error);
+                alert('Failed to load cities. Please try again later.');
+            });
+        }
+
+        function handleResponse(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        }
+    </script>
+</body>
+</html>
